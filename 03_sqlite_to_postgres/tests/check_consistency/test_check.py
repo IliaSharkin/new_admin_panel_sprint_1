@@ -1,4 +1,5 @@
-from load_classes import PostgreMenedger, SqliteMenedger
+from psql_manager import PostgreMenedger
+from sqlite_manager import SqliteMenedger
 
 sqlite = SqliteMenedger()
 postgre = PostgreMenedger('content')
