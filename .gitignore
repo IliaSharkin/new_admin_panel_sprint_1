@@ -1,0 +1,7 @@
+env
+.env
+03_sqlite_to_postgres/__pycache__/*
+02_movies_admin/movies/migrations/__pycache__/*
+02_movies_admin/movies/__pycache__/*
+03_sqlite_to_postgres/tests/check_consistency/__pycache__/*
+02_movies_admin/config/__pycache__/*

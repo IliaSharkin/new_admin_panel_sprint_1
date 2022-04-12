@@ -13,9 +13,39 @@ class TimeStampedModel(models.Model):
 
     class Meta:
         abstract = True
+        
+class Genre(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(_("name"), max_length=200)
+    description = models.CharField(_("description"), max_length=50, null=True)
+
+    class Meta:
+        verbose_name = _('Genre')
+        verbose_name_plural = _('Genres')
+        ordering = ('-name',)
+        db_table = 'content\".\"genre'
+
+    def __str__(self):
+        return self.name
+
+class Person(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    full_name = models.CharField(_("full_name"), max_length=200)
+    birth_date = models.DateField(
+        _("birth_date"), auto_now=False, auto_now_add=False, null=True
+    )
+
+    class Meta:
+        verbose_name = _('Person')
+        verbose_name_plural = _('Persons')
+        ordering = ('-full_name',)
+        db_table = 'content\".\"person'
+
+    def __str__(self):
+        return self.full_name
 
 
-class Film_work(TimeStampedModel):
+class Filmwork(TimeStampedModel):
 
     class FilmworkType(models.TextChoices):
         MOVIE = "movie", _("movie")
@@ -32,39 +62,27 @@ class Film_work(TimeStampedModel):
         _("file"), upload_to="film_works/", max_length=200, null=True
     )
     rating = models.FloatField(
-        _("rating"), validators=[MinValueValidator(0), MaxValueValidator(10)], blank=True, null=True
+        _("rating"), validators=[MinValueValidator(0), MaxValueValidator(10)],
+        blank=True, null=True
     )
     type = models.CharField(_("type"), max_length=20, choices=FilmworkType.choices)
+    genres = models.ManyToManyField(Genre, through='GenreFilmwork')
+    persons = models.ManyToManyField(Person, through='PersonFilmwork')
 
     class Meta:
         verbose_name = _('Movie')
         verbose_name_plural = _('Movies')
         ordering = ('-title',)
-        db_table = "content\".\"film_work"
+        db_table = 'content\".\"film_work'
 
     def __str__(self):
         return self.title
 
 
-class Genre(TimeStampedModel):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(_("name"), max_length=200)
-    description = models.CharField(_("description"), max_length=50, null=True)
-
-    class Meta:
-        verbose_name = _('Genre')
-        verbose_name_plural = _('Genres')
-        ordering = ('-name',)
-        db_table = "content\".\"genre"
-
-    def __str__(self):
-        return self.name
-
-
-class Genre_film_work(models.Model):
+class GenreFilmwork(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     film_work = models.ForeignKey(
-        "Film_work", on_delete=models.CASCADE
+        "Filmwork", on_delete=models.CASCADE
     )
     genre = models.ForeignKey(
         "Genre", on_delete=models.CASCADE
@@ -72,7 +90,7 @@ class Genre_film_work(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "content\".\"genre_film_work"
+        db_table = 'content\".\"genre_film_work'
         constraints = [
             UniqueConstraint(fields=['film_work', 'genre'], name='film_work_genre_cnst')
         ]
@@ -81,33 +99,16 @@ class Genre_film_work(models.Model):
         ]
 
 
-class Person(TimeStampedModel):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    full_name = models.CharField(_("full_name"), max_length=200)
-    birth_date = models.DateField(
-        _("birth_date"), auto_now=False, auto_now_add=False, null=True
-    )
-
-    class Meta:
-        verbose_name = _('Person')
-        verbose_name_plural = _('Persons')
-        ordering = ('-full_name',)
-        db_table = "content\".\"person"
-
-    def __str__(self):
-        return self.full_name
-
-
 class PersonRole(models.TextChoices):
     screenwriter = 'screenwriter', _('screenwriter')
     actor = 'actor', _('actor')
     director = 'director', _('director')
 
 
-class Person_film_work(models.Model):
+class PersonFilmwork(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     film_work = models.ForeignKey(
-        "Film_work", on_delete=models.CASCADE
+        "Filmwork", on_delete=models.CASCADE
     )
     person = models.ForeignKey(
         "Person", on_delete=models.CASCADE
@@ -116,7 +117,7 @@ class Person_film_work(models.Model):
     created_at = models.DateTimeField(_("created_at"), auto_now_add=False)
 
     class Meta:
-        db_table = "content\".\"person_film_work"
+        db_table = 'content\".\"person_film_work'
         constraints = [
             UniqueConstraint(fields=['film_work', 'person'], name='film_work_person_cnst')
         ]

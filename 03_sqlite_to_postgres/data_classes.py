@@ -4,11 +4,10 @@ from datetime import datetime
 
 
 @dataclass
-class Film_work:
+class Filmwork:
     title: str
     description: str
     creation_date: datetime
-    certificate: str
     file_path: str
     rating: float
     type: str
@@ -27,7 +26,7 @@ class Genre:
 
 
 @dataclass
-class Genre_film_work:
+class GenreFilmwork:
     film_work_id: str
     genre_id: str
     created_at: datetime
@@ -37,14 +36,13 @@ class Genre_film_work:
 @dataclass
 class Person:
     full_name: str
-    birth_date: datetime
     created_at: datetime
     updated_at: datetime
     id: uuid.UUID = field(default_factory=uuid.uuid4)
 
 
 @dataclass
-class Person_film_work:
+class PersonFilmwork:
     film_work_id: str
     person_id: str
     role: str

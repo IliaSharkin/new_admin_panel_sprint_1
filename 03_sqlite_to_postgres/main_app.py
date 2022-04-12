@@ -1,4 +1,5 @@
-from load_classes import PostgreMenedger, SqliteMenedger
+from sqlite_manager import SqliteMenedger
+from psql_manager import PostgreMenedger
 
 
 if __name__ == '__main__':
